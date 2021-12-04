@@ -1,0 +1,9 @@
+# Ignore xlsx/csv invoices
+*.xlsx
+*.csv
+
+# Ignore sqlite files
+*.db
+
+# Ignore live-refresh utility
+gin-bin
