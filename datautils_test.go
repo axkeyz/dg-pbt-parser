@@ -57,17 +57,17 @@ func TestGetRegion(t *testing.T) {
 func TestGetSortbyCode(t *testing.T) {
 	// Test cases
 	cases := map[string][]string{
-		"ST": {
-			"S & T 1820", "Steel & Tube Roofing Te Rapa",
+		"MX": {
+			"IO HJSFG", "sdfkjh IO",
 		},
-		"GUNZ": {
-			"GNZ6030", "Pyes Pa Dentists",
+		"RTF": {
+			"IXU 2348", "VSD INOB",
 		},
-		"SALES": {
-			"EC218", "ETC COMPUTER",
+		"MF": {
+			"MF & 2390", "Edf EE",
 		},
-		"E COMMERCE": {
-			"EC219", "John Smith",
+		"OP": {
+			"OPURO@2388", "OPdjjjh",
 		},
 	}
 
@@ -79,6 +79,34 @@ func TestGetSortbyCode(t *testing.T) {
 			t.Fatalf(
 				`TestGetSortbyCode did not return %s, got %s`,
 				expected, actual,
+			)
+		}
+	}
+}
+
+// TestHasDGSortbyCode tests HasDGSortbyCode and checks if the
+// sortby code is in the customers outlined in config/customers_test.json.
+func TestHasDGSortbyCode(t *testing.T) {
+	customers := OpenConfigJSON("customers_test")
+
+	cases := map[string]bool{
+		"RTF":   false,
+		"MX":    true,
+		"MXUDF": true,
+		"OPURO": true,
+		"OP":    false,
+		"NXU":   false,
+	}
+
+	// Repeat test for each test case
+	for test, expected := range cases {
+		actual := HasDGSortbyCode(test, customers)
+
+		if actual != expected {
+			// Test failed
+			t.Fatalf(
+				`TestStripNonLetters("%s") did not return %v, got %v`,
+				test, expected, actual,
 			)
 		}
 	}

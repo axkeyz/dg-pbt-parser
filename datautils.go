@@ -19,8 +19,22 @@ func GetCustomerRef(mainRef string, subRef string) string {
 // customer reference (customerRef). If the corresponding value
 // cannot be obtained, then it is returned as "UNKNOWN".
 func GetSortbyCode(customerRef string, receiverName string) string {
-	sortbyCode := StripNonLetters(customerRef)
-	return strings.ToUpper(sortbyCode)
+	sortbyCode := strings.ToUpper(StripNonLetters(customerRef))
+	return sortbyCode
+}
+
+// HasDGSortbyCode returns true if the given sortby code (sortbyCode) has a
+// DG-specific version in the given customers map.
+func HasDGSortbyCode(sortbyCode string, customers map[string][]string) bool {
+	for _, customer := range customers {
+		for _, c := range customer {
+			if c == sortbyCode {
+				return true
+			}
+		}
+	}
+	// Does not have a DG sortby code
+	return false
 }
 
 // GetRegion attempts to extract the region when given the PBT
