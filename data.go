@@ -3,9 +3,12 @@
 package main
 
 import (
+	"strconv"
 	"strings"
 )
 
+// Create200779Rows formats a [][]string of rows from a PBTOne
+// worksheet into a []PBTItem.
 func Create200779Rows(worksheetRows [][]string) []PBTItem {
 	var pbtRows []PBTItem
 	customers := OpenConfigJSON("customers")
@@ -28,6 +31,30 @@ func Create200779Rows(worksheetRows [][]string) []PBTItem {
 
 		// add pbtItem to array of pbtDBRows
 		pbtRows = append(pbtRows, pbtItem)
+	}
+
+	return pbtRows
+}
+
+// CreateInvoiceRows formats a [][]string of rows from an invoice
+// worksheet into a []PBTItem.
+func CreateInvoiceRows(worksheetRows [][]string) []PBTItem {
+	var pbtRows []PBTItem
+
+	var item_cost int
+
+	for _, row := range worksheetRows[1:] {
+		item_cost, _ = strconv.Atoi(row[10])
+
+		if item_cost > 0 {
+			// Create new pbtItem from each row
+			pbtItem := PBTItem{
+				Consignment: row[0],
+			}
+
+			// add pbtItem to array of pbtDBRows
+			pbtRows = append(pbtRows, pbtItem)
+		}
 	}
 
 	return pbtRows
