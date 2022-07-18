@@ -3,8 +3,8 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
-	"log"
 )
 
 // StripNonLetters is a utility function that strips all non-letters
@@ -30,7 +30,7 @@ func OpenConfigJSON(fileName string) map[string][]string {
 	// Get entire contents of file
 	content, err := ioutil.ReadFile("config/" + fileName + ".json")
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 
 	// Unmarshal or Decode the JSON to the interface.
