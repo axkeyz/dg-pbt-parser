@@ -53,19 +53,27 @@ func TestGetRegion(t *testing.T) {
 }
 
 // TestGetSortbyCode calls GetSortbyCode and checks if the
-// sortby code is returned in the correct format.
+// sortby code is returned in the correct format. Also se
 func TestGetSortbyCode(t *testing.T) {
 	// Test cases
-	cases := map[string]string{
-		"S&T 1873":      "ST",
-		"EC19602":       "EC",
-		"NTT4501151003": "NTT",
+	cases := map[string][]string{
+		"ST": {
+			"S & T 1820", "Steel & Tube Roofing Te Rapa",
+		},
+		"GUNZ": {
+			"GNZ6030", "Pyes Pa Dentists",
+		},
+		"SALES": {
+			"EC218", "ETC COMPUTER",
+		},
+		"E COMMERCE": {
+			"EC219", "John Smith",
+		},
 	}
 
 	// Repeat test for each test case
-	for test, expected := range cases {
-		actual := GetSortbyCode(test)
-
+	for expected, inputs := range cases {
+		actual := GetSortbyCode(inputs[0], inputs[1])
 		if actual != expected {
 			// Test failed
 			t.Fatalf(

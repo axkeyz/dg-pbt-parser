@@ -18,7 +18,7 @@ func GetCustomerRef(mainRef string, subRef string) string {
 // GetSortbyCode attempts to extract the sortby code from the
 // customer reference (customerRef). If the corresponding value
 // cannot be obtained, then it is returned as "UNKNOWN".
-func GetSortbyCode(customerRef string) string {
+func GetSortbyCode(customerRef string, receiverName string) string {
 	sortbyCode := StripNonLetters(customerRef)
 	return strings.ToUpper(sortbyCode)
 }
@@ -34,19 +34,4 @@ func GetRegion(depotName string) string {
 	// Remove first two words (PBT Couriers) and last word (Depot)
 	name := strings.Split(depotName, " ")[2:]
 	return strings.ToUpper(strings.Join(name[:len(name)-1], " "))
-}
-
-// StripNonLetters is a utility function that strips all non-letters
-// from the given string (str).
-func StripNonLetters(str string) string {
-	s := []byte(str)
-	n := 0
-	for _, b := range s {
-		if ('a' <= b && b <= 'z') ||
-			('A' <= b && b <= 'Z') {
-			s[n] = b
-			n++
-		}
-	}
-	return string(s[:n])
 }
