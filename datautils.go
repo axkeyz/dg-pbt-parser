@@ -4,17 +4,6 @@ package main
 
 import "strings"
 
-// GetCustomerRef combines the main reference (mainRef) with the
-// secondary reference (subRef) if applicable.
-func GetCustomerRef(mainRef string, subRef string) string {
-	if subRef != "" {
-		// Combine main reference with secondary reference
-		mainRef = mainRef + " (" + subRef + ")"
-	}
-	// Return output
-	return strings.ToUpper(mainRef)
-}
-
 // GetSortbyCode attempts to extract the sortby code from the
 // customer reference (customerRef). If the corresponding value
 // cannot be obtained, then it is returned as "UNKNOWN".
@@ -25,9 +14,20 @@ func GetSortbyCode(
 	sortbyCode := strings.ToUpper(StripNonLetters(customerRef))
 
 	if ok, sortbyCode := HasDGSortbyCode(sortbyCode, customers); ok {
+		// Retrun standardised DG sortby code
 		return sortbyCode
 	}
-	return TryDGSalesEComSortbyCode(receiverName, salesCustomers)
+
+	// Try getting ecom/sales code from the receiver name
+	ecomSalesCode := TryDGSalesEComSortbyCode(receiverName, salesCustomers)
+	if ecomSalesCode == "UNKNOWN" &&
+		StripNonLetters(customerRef) == "EC" {
+		// Check if ecom/sales code by customer reference
+		return sortbyCode
+	}
+
+	// Return code
+	return ecomSalesCode
 }
 
 // HasDGSortbyCode returns true if the given sortby code (sortbyCode) has a

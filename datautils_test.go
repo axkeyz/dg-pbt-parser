@@ -3,28 +3,6 @@ package main
 
 import "testing"
 
-// TestGetCustomerRef calls GetCustomerRef and checks if the
-// customer reference is returned in the correct format.
-func TestGetCustomerRef(t *testing.T) {
-	case1 := GetCustomerRef("BD987", "n987")
-	if case1 != "BD987 (N987)" {
-		// Test failed
-		t.Fatalf(
-			`TestGetCustomerRef did not return BD987 (N987), got %s`,
-			case1,
-		)
-	}
-
-	case2 := GetCustomerRef("ux12345", "")
-	if case2 != "UX12345" {
-		// Test failed
-		t.Fatalf(
-			`TestGetCustomerRef did not return UX12345, got %s`,
-			case2,
-		)
-	}
-}
-
 // TestGetRegion calls GetRegion and checks if the
 // region is extracted correctly from a string.
 func TestGetRegion(t *testing.T) {
