@@ -10,7 +10,7 @@ import (
 // does not exist already.
 func CreateDB(database *sql.DB, tableName string) {
 	// Create the database table and columns
-	_, err := database.Exec(`CREATE TABLE IF NOT EXISTS ? (
+	createTableSQL := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		consignment_date DATE,
 		manifest_num TEXT NULL,
@@ -29,6 +29,8 @@ func CreateDB(database *sql.DB, tableName string) {
 		first_invoice DATE,
 		last_invoice DATE
 	);`, tableName)
+
+	_, err := database.Exec(createTableSQL)
 
 	// Display the error
 	if err != nil {
