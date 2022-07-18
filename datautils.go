@@ -4,6 +4,17 @@ package main
 
 import "strings"
 
+// GetCustomerRef combines the main reference (mainRef) with the
+// secondary reference (subRef) if applicable.
+func GetCustomerRef(mainRef string, subRef string) string {
+	if subRef != "" {
+		// Combine main reference with secondary reference
+		mainRef = mainRef + " (" + subRef + ")"
+	}
+	// Return output
+	return strings.ToUpper(mainRef)
+}
+
 // GetSortbyCode attempts to extract the sortby code from the
 // customer reference (customerRef). If the corresponding value
 // cannot be obtained, then it is returned as "UNKNOWN".

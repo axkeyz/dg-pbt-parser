@@ -12,19 +12,18 @@ func Create200779Rows(worksheetRows [][]string) []PBTItem {
 	sales := OpenConfigJSON("sales")
 
 	for _, row := range worksheetRows[1:] {
-		customerRef := GetCustomerRef(row[2], row[23])
 		// Create new pbtItem from each row
 		pbtItem := PBTItem{
 			ConsignmentDate: row[4][0:10],
 			ManifestNum:     row[3],
 			Consignment:     row[0],
-			CustomerRef:     customerRef,
+			CustomerRef:     GetCustomerRef(row[2], row[23]),
 			ReceiverName:    strings.ToUpper(row[7]),
 			AreaTo:          GetRegion(row[18]),
 			TrackingNumber:  row[1],
 			Weight:          row[11],
 			Cubic:           row[12],
-			SortbyCode:      GetSortbyCode(customerRef, row[7], customers, sales),
+			SortbyCode:      GetSortbyCode(row[2], row[7], customers, sales),
 		}
 
 		// add pbtItem to array of pbtDBRows
