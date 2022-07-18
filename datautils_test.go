@@ -58,7 +58,7 @@ func TestGetSortbyCode(t *testing.T) {
 	// Test cases
 	cases := map[string][]string{
 		"MX": {
-			"IO HJSFG", "sdfkjh IO",
+			"IO908896690", "sdfkjh IO",
 		},
 		"RTF": {
 			"IXU 2348", "VSD INOB",
