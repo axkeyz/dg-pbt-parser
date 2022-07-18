@@ -10,11 +10,10 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-// GetAllPBTOneRunsheets returns a []string of all files that
-// have a file name matching *runsheet_exporting*.xlsx
-func GetAllPBTOneRunsheets() []string {
+// GetMatchingRunsheets returns a []string of all files that
+// have a file name matching the givern pattern.
+func GetMatchingRunsheets(pattern string) []string {
 	// Search for a file that matches the runsheet file name
-	pattern := "uploads/*runsheet_exporting*.xls*"
 	matches, err := filepath.Glob(pattern)
 
 	if err != nil {
@@ -48,7 +47,7 @@ func ExtractPBTONERunsheet(runsheet string) [][]string {
 // where the data is extracted from the available PBTOne spreadsheets.
 func CreateAll200779DBRows(database *sql.DB) {
 	// Get the PBT runsheets
-	runsheets := GetAllPBTOneRunsheets()
+	runsheets := GetMatchingRunsheets("uploads/*runsheet_exporting*.xls*")
 
 	for _, runsheet := range runsheets {
 		// Create a PBT item row for each line in spreadsheet
@@ -60,3 +59,8 @@ func CreateAll200779DBRows(database *sql.DB) {
 		}
 	}
 }
+
+// TODO: Get all invoices and extract needed data
+// func GetAllInvoices(database *sql.DB) {
+// 	invoices := GetMatchingRunsheets("uploads/WebCSVStmt_*")
+// }
