@@ -12,4 +12,5 @@ gin-bin
 *hidden_test.go
 
 # Ignore hidden config files
-config/
+config/*
+!config/*_test.json
