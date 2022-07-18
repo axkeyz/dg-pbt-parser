@@ -58,7 +58,7 @@ func TestGetSortbyCode(t *testing.T) {
 	// Test cases
 	cases := map[string][]string{
 		"MX": {
-			"IO908896690", "sdfkjh IO",
+			"MXUDF908896690", "sdfkjh IO",
 		},
 		"RTF": {
 			"IXU 2348", "VSD INOB",
@@ -67,13 +67,24 @@ func TestGetSortbyCode(t *testing.T) {
 			"MF & 2390", "Edf EE",
 		},
 		"OP": {
-			"OPURO@2388", "OPdjjjh",
+			"skjdhf2198", "MUXIO IO",
+		},
+		"ZZ": {
+			"SNOOZE", "SNOOZE",
+		},
+		"UNKNOWN": {
+			"MD", "FUIOX",
+		},
+		"SALES": {
+			"SN", "SOMETHING ltd",
 		},
 	}
+	customers := OpenConfigJSON("customers_test")
+	sales := OpenConfigJSON("sales_test")
 
 	// Repeat test for each test case
 	for expected, inputs := range cases {
-		actual := GetSortbyCode(inputs[0], inputs[1])
+		actual := GetSortbyCode(inputs[0], inputs[1], customers, sales)
 		if actual != expected {
 			// Test failed
 			t.Fatalf(
@@ -100,13 +111,43 @@ func TestHasDGSortbyCode(t *testing.T) {
 
 	// Repeat test for each test case
 	for test, expected := range cases {
-		actual := HasDGSortbyCode(test, customers)
+		actual, _ := HasDGSortbyCode(test, customers)
 
 		if actual != expected {
 			// Test failed
 			t.Fatalf(
 				`TestStripNonLetters("%s") did not return %v, got %v`,
 				test, expected, actual,
+			)
+		}
+	}
+}
+
+// TestTryDGSalesEComSortbyCode tests TryDGSalesEComSortbyCode
+// and checks if the correct sortby code is returned as according to
+// the customers outlined in config/sales_test.json.
+func TestTryDGSalesEComSortbyCode(t *testing.T) {
+	// Open config file for sales customers
+	customers := OpenConfigJSON("sales_test")
+
+	// Test cases
+	cases := map[string]string{
+		"RIOLEMY LTD":   "SALES",
+		"SNOOZE":        "ZZ",
+		"MF INDYOS LTD": "HH",
+		"JOHN SMITH":    "E COMMERCE",
+		"ASDFGHJLOOO":   "UNKNOWN",
+	}
+
+	// Repeat test for each test case
+	for test, expected := range cases {
+		actual := TryDGSalesEComSortbyCode(test, customers)
+
+		if actual != expected {
+			// Test failed
+			t.Fatalf(
+				`TestTryDGSalesEComSortbyCode did not return %v, got %v`,
+				expected, actual,
 			)
 		}
 	}
