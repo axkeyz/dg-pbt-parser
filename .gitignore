@@ -7,3 +7,9 @@
 
 # Ignore live-refresh utility
 gin-bin
+
+# Ignore hidden tests
+*hidden_test.go
+
+# Ignore hidden config files
+config/
