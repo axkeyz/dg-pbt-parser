@@ -152,3 +152,53 @@ func TestGetCustomerRef(t *testing.T) {
 		)
 	}
 }
+
+// TestGetInvoiceCostTypeAndConsignment tests
+// GetInvoiceCostTypeAndConsignment to see if the correct cost type
+// and consignment number is returned.
+func TestGetInvoiceCostTypeAndConsignment(t *testing.T) {
+	// Test cases
+	cases := map[string][]string{
+		"1": {
+			"UT310666",
+			"AKL OKA4502988001 0x0x0cm",
+			"UT", "OKA4502988001",
+		},
+		"2": {
+			"RD2441595",
+			"OKA6502998011",
+			"ADJ", "OKA6502998011",
+		},
+		"3": {
+			"RU2390034",
+			"OKA2692393001-2692393001",
+			"RUR", "OKA2692393001",
+		},
+		"4": {
+			"UT332616",
+			"AKL OKA1502319001 0x0x0cm",
+			"UT", "OKA1502319001",
+		},
+		"5": {
+			"OKA3240408901",
+			"Delivered-Wellington                MX5555",
+			"NOR", "OKA3240408901",
+		},
+	}
+
+	// Repeat test for each test case
+	for test, expected := range cases {
+		actualtype, actualconsignment := GetInvoiceCostTypeAndConsignment(
+			expected[0], expected[1],
+		)
+
+		if actualtype != expected[2] || actualconsignment != expected[3] {
+			// Test failed
+			t.Fatalf(
+				`TestGetInvoiceCostTypeAndConsignment2 #%s 
+				did not return %s, %s got %s, %s`, test, expected[2],
+				expected[3], actualtype, actualconsignment,
+			)
+		}
+	}
+}

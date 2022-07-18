@@ -99,3 +99,29 @@ func GetRegion(depotName string) string {
 	name := strings.Split(depotName, " ")[2:]
 	return strings.ToUpper(strings.Join(name[:len(name)-1], " "))
 }
+
+// GetInvoiceCostTypeAndConsignment attempts to get the cost type
+// and the consignment number.
+// Cost type codes:
+//	- RUR: Rural
+//	- ADJ: Adjustment
+//	- CL: CL-type items
+//	- UT: Underticket
+//	- NOR: Normal
+func GetInvoiceCostTypeAndConsignment(reference string,
+	description string) (costtype string, consignment string) {
+	reference = strings.Split(reference, " ")[0]
+
+	if strings.Contains(reference, "RU") {
+		return "RUR", strings.Split(description, "-")[0]
+	} else if strings.Contains(reference, "RD") {
+		return "ADJ", strings.Split(description, " ")[0]
+	} else if strings.Contains(reference, "CL") {
+		return "CL", reference
+	} else if strings.Contains(reference, "UT") ||
+		reference == "" {
+		return "UT", strings.Split(description, " ")[1]
+	} else {
+		return "NOR", reference
+	}
+}
