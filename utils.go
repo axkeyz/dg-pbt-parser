@@ -49,3 +49,11 @@ func IsInArray(item string, array []string) bool {
 	}
 	return false
 }
+
+// FormatError is a generic function to format an error if
+// applicable.
+func FormatError(err error) {
+	if err != nil {
+		fmt.Println(err)
+	}
+}
