@@ -4,7 +4,9 @@ package main
 
 import (
 	"database/sql"
+	"io/ioutil"
 	"path/filepath"
+	"strings"
 
 	"github.com/xuri/excelize/v2"
 )
@@ -21,15 +23,32 @@ func GetMatchingRunsheets(pattern string) []string {
 
 // ExtractPBTONERunsheet extracts the data from the named
 // PBTONE runsheet.
-func ExtractPBTONERunsheet(runsheet string) [][]string {
+func ExtractSheet(runsheet string, format string) [][]string {
 	var rows [][]string
 
-	// Open the runsheet
-	f, err := excelize.OpenFile(runsheet)
-	FormatError(err)
-	// Get all the rows in the Sheet1.
-	rows, err = f.GetRows("RunSheet_exporting")
-	FormatError(err)
+	if format == "xlsx" {
+		// Open the runsheet
+		f, err := excelize.OpenFile(runsheet)
+		FormatError(err)
+		// Get all the rows in the Sheet1.
+		rows, err = f.GetRows(f.GetSheetList()[0])
+		FormatError(err)
+	} else {
+		f, err := ioutil.ReadFile(runsheet)
+		FormatError(err)
+
+		items := strings.Split(string(f), "\n")
+
+		for _, item := range items {
+			row := make([]string, 11)
+			i := strings.Split(item, ",")
+			for j, k := range i {
+				i[j] = strings.TrimSpace(k)
+			}
+			copy(row, i)
+			rows = append(rows, row)
+		}
+	}
 
 	return rows
 }
@@ -42,7 +61,7 @@ func CreateAll200779DBRows(database *sql.DB) {
 
 	for _, runsheet := range runsheets {
 		// Create a PBT item row for each line in spreadsheet
-		pbtRows := Create200779Rows(ExtractPBTONERunsheet(runsheet))
+		pbtRows := Create200779Rows(ExtractSheet(runsheet, "xlsx"))
 
 		// Create a new row in the database for each PBT item row
 		for _, row := range pbtRows {
@@ -51,7 +70,19 @@ func CreateAll200779DBRows(database *sql.DB) {
 	}
 }
 
-// TODO: Get all invoices and extract needed data
-// func GetAllInvoices(database *sql.DB) {
-// 	invoices := GetMatchingRunsheets("uploads/WebCSVStmt_*")
-// }
+// Get all invoices and extract needed data
+func CreateAllInvoiceCosts(database *sql.DB, table string) {
+	// func CreateAllInvoiceCosts() {
+	invoices := GetMatchingRunsheets("uploads/WebCSVStmt_*")
+	// var costtype, consignment string
+
+	for _, invoice := range invoices {
+		// fmt.Println(invoice)
+		// fmt.Println(ExtractSheet(invoice, "csv")[10][10])
+		items := CreateInvoiceRows(ExtractSheet(invoice, "csv"))
+		// fmt.Println(items)
+		for _, item := range items {
+			UpdateDBForInvoices(database, table, item)
+		}
+	}
+}
