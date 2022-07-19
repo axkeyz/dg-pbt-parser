@@ -63,7 +63,7 @@ func TestGetNonEmptyCols(t *testing.T) {
 		Adjustment:  "9.23",
 		AreaTo:      "Uranus",
 	}
-	actual := case1.GetNonEmptyCols()
+	actual, _ := case1.GetNonEmptyCols()
 	expected := []string{
 		"customer_ref", "area_to", "adjustment",
 	}

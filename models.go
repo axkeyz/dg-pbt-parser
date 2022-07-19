@@ -46,9 +46,9 @@ func (item *PBTItem) SetCost(
 
 // *PBTItem.GetNonEmptyCols returns a []string of all
 // non-null fields in the given PBTItem.
-func (item *PBTItem) GetNonEmptyCols() []string {
-	var columns []string
-
+func (item *PBTItem) GetNonEmptyCols() (
+	columns []string, data []string,
+) {
 	fields := map[string]string{
 		"consignment_date": item.ConsignmentDate,
 		"manifest_num":     item.ManifestNum,
@@ -73,8 +73,9 @@ func (item *PBTItem) GetNonEmptyCols() []string {
 	for col, val := range fields {
 		if val != "" {
 			columns = append(columns, col)
+			data = append(data, "\""+val+"\"")
 		}
 	}
 
-	return columns
+	return columns, data
 }
