@@ -2,7 +2,9 @@
 // data from strings for the final accounting spreadsheet
 package main
 
-import "strings"
+import (
+	"strings"
+)
 
 // GetCustomerRef combines the main reference (mainRef) with the
 // secondary reference (subRef) if applicable.
@@ -124,4 +126,11 @@ func GetInvoiceCostTypeAndConsignment(reference string,
 	} else {
 		return "NOR", reference
 	}
+}
+
+// GetInvoiceDate gets the invoice date from the A1 cell.
+func GetInvoiceDate(a1 string) string {
+	cell := strings.Split(a1, " ")
+	date := cell[len(cell)-3:]
+	return strings.Join(date, " ")
 }
