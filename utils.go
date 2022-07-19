@@ -39,3 +39,13 @@ func OpenConfigJSON(fileName string) map[string][]string {
 	// Return content
 	return configJSON
 }
+
+// IsInArray returns true if a string is in the []string.
+func IsInArray(item string, array []string) bool {
+	for _, i := range array {
+		if item == i {
+			return true
+		}
+	}
+	return false
+}

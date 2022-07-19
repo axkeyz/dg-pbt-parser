@@ -24,10 +24,10 @@ type PBTItem struct {
 	LastInvoice     string
 }
 
-// SetPBTItemCost sets PBT a cost depending on the
+// *PBTItem.SetCost sets PBT a cost depending on the
 // given cost type.
-func SetPBTItemCost(cost string, costtype string,
-	item *PBTItem) {
+func (item *PBTItem) SetCost(
+	cost string, costtype string) {
 	switch costtype {
 	case "NOR":
 		item.ItemCost = cost
@@ -39,5 +39,42 @@ func SetPBTItemCost(cost string, costtype string,
 		item.UnderTicket = cost
 	case "CL":
 		item.Other = cost
+	default:
+		item.ItemCost = cost
 	}
+}
+
+// *PBTItem.GetNonEmptyCols returns a []string of all
+// non-null fields in the given PBTItem.
+func (item *PBTItem) GetNonEmptyCols() []string {
+	var columns []string
+
+	fields := map[string]string{
+		"consignment_date": item.ConsignmentDate,
+		"manifest_num":     item.ManifestNum,
+		"consignment":      item.Consignment,
+		"customer_ref":     item.CustomerRef,
+		"receiver_name":    item.ReceiverName,
+		"area_to":          item.AreaTo,
+		"tracking_number":  item.TrackingNumber,
+		"weight":           item.Weight,
+		"cubic":            item.Cubic,
+		"item_cost":        item.ItemCost,
+		"sortby_code":      item.SortbyCode,
+		"rural_delivery":   item.RuralDelivery,
+		"under_ticket":     item.UnderTicket,
+		"adjustment":       item.Adjustment,
+		"other":            item.Other,
+		"ff_items":         item.FFItems,
+		"first_invoice":    item.FirstInvoice,
+		"last_invoice":     item.LastInvoice,
+	}
+
+	for col, val := range fields {
+		if val != "" {
+			columns = append(columns, col)
+		}
+	}
+
+	return columns
 }
