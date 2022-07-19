@@ -41,19 +41,35 @@ func Create200779Rows(worksheetRows [][]string) []PBTItem {
 func CreateInvoiceRows(worksheetRows [][]string) []PBTItem {
 	var pbtRows []PBTItem
 
-	var item_cost int
+	var item_cost float64
 
-	for _, row := range worksheetRows[1:] {
-		item_cost, _ = strconv.Atoi(row[10])
+	for _, row := range worksheetRows {
+		if strings.Contains(row[0], "Statement") ||
+			strings.Contains(row[0], "GST") {
+			continue
+		} else if strings.Contains(row[3], "VFC") ||
+			strings.Contains(row[3], "NETT AMT") ||
+			strings.Contains(row[9], "----") {
+			break
+		}
 
-		if item_cost > 0 {
+		item_cost, _ = strconv.ParseFloat(row[9], 32)
+
+		if int(item_cost*100) > 0 {
 			// Create new pbtItem from each row
-			pbtItem := PBTItem{
-				Consignment: row[0],
+			costtype, consignment := GetInvoiceCostTypeAndConsignment(row[1], row[3])
+
+			// Set the consignment value
+			item := PBTItem{
+				TrackingNumber: strings.ToUpper(consignment),
+				FirstInvoice:   GetInvoiceDate(worksheetRows[0][0]),
 			}
 
+			// Set the cost
+			item.SetCost(row[9], costtype)
+
 			// add pbtItem to array of pbtDBRows
-			pbtRows = append(pbtRows, pbtItem)
+			pbtRows = append(pbtRows, item)
 		}
 	}
 
