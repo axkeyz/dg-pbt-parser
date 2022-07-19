@@ -4,7 +4,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"path/filepath"
 
 	"github.com/xuri/excelize/v2"
@@ -15,11 +14,7 @@ import (
 func GetMatchingRunsheets(pattern string) []string {
 	// Search for a file that matches the runsheet file name
 	matches, err := filepath.Glob(pattern)
-
-	if err != nil {
-		// Display the error
-		fmt.Println(err)
-	}
+	FormatError(err)
 
 	return matches
 }
@@ -31,14 +26,10 @@ func ExtractPBTONERunsheet(runsheet string) [][]string {
 
 	// Open the runsheet
 	f, err := excelize.OpenFile(runsheet)
-	if err != nil {
-		fmt.Println(err)
-	}
+	FormatError(err)
 	// Get all the rows in the Sheet1.
 	rows, err = f.GetRows("RunSheet_exporting")
-	if err != nil {
-		fmt.Println(err)
-	}
+	FormatError(err)
 
 	return rows
 }
@@ -55,7 +46,7 @@ func CreateAll200779DBRows(database *sql.DB) {
 
 		// Create a new row in the database for each PBT item row
 		for _, row := range pbtRows {
-			NewDBRow(database, "pbt_200779", row)
+			NewDBRow(database, "pbt_200779", row, true)
 		}
 	}
 }
