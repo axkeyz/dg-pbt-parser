@@ -112,7 +112,8 @@ func GetRegion(depotName string) string {
 //	- NOR: Normal
 func GetInvoiceCostTypeAndConsignment(reference string,
 	description string) (costtype string, consignment string) {
-	reference = strings.Split(reference, " ")[0]
+	reference = strings.ToUpper(strings.Split(reference, " ")[0])
+	description = strings.ToUpper(description)
 
 	if strings.Contains(reference, "RU") {
 		return "RUR", strings.Split(description, "-")[0]
