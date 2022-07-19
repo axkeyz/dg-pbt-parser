@@ -94,3 +94,77 @@ func IsRowInDB(database *sql.DB, table string, tracking string) bool {
 
 	return exists
 }
+
+// IsRowInDBCurrentMonth returns a bool of whether there is a
+// record in the DB with the same tracking number and in the current
+// month or has no month. If this is true, it returns the row ID
+// as a string.
+func IsRowInDBCurrentMonth(database *sql.DB, table string,
+	item PBTItem) (exists bool, id string) {
+	query := fmt.Sprintf(
+		`SELECT id from %s WHERE tracking_number = '%s' 
+		AND (first_invoice IS NULL OR
+			strftime('%%m', first_invoice) = 
+			'%s')`, table,
+		item.TrackingNumber, item.FirstInvoice,
+	)
+
+	err := database.QueryRow(query).Scan(&id)
+	if err != nil && err != sql.ErrNoRows {
+		FormatError(err)
+	}
+
+	if id != "" {
+		exists = true
+	}
+
+	return exists, id
+}
+
+// UpdateDBRow updates a row if the item.first_invoice is in the same
+// month as the first_invoice in the database. Otherwise, it will create
+// a new row.
+func UpdateDBForInvoices(database *sql.DB, table string, item PBTItem) {
+	isRow := IsRowInDB(database, table, item.TrackingNumber)
+	isCurrentRow, rowID := IsRowInDBCurrentMonth(database, table, item)
+
+	var query string
+
+	if isCurrentRow {
+		// Change invoice dates
+		item.SwapInvoiceDates()
+		// Update the row with non-empty rows
+		query = fmt.Sprintf(
+			"UPDATE %s SET %s WHERE id = %s",
+			table, item.GetNonEmptyColsEqualised(),
+			rowID,
+		)
+		// Execute the query
+		_, err := database.Exec(query)
+		FormatError(err)
+		fmt.Println(query)
+	} else if isRow {
+		// Copy the data
+		query = fmt.Sprintf(
+			`INSERT INTO %s (consignment_date, manifest_num,
+				consignment, customer_ref, receiver_name,
+				area_to, tracking_number, weight, cubic,
+				sortby_code) SELECT consignment_date, manifest_num,
+				consignment, customer_ref, receiver_name,
+				area_to, tracking_number, weight, cubic,
+				sortby_code FROM %s WHERE tracking_number = '%s'`,
+			table, table, item.TrackingNumber,
+		)
+		// Execute the query
+		_, err := database.Exec(query)
+		FormatError(err)
+		fmt.Println(query)
+
+		// Refresh the data
+		UpdateDBForInvoices(database, table, item)
+	} else {
+		// Create a new row with non-empty rows
+		item.SortbyCode = "UNKNOWN"
+		NewDBRow(database, table, item, false)
+	}
+}
