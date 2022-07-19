@@ -1,5 +1,7 @@
 package main
 
+import "strings"
+
 // PBTItem represents a row of PBT data (one row per freight
 // item).
 type PBTItem struct {
@@ -78,4 +80,25 @@ func (item *PBTItem) GetNonEmptyCols() (
 	}
 
 	return columns, data
+}
+
+// *PBTItem.GetNonEmptyCols returns a []string of all
+// non-null fields in the given PBTItem.
+func (item *PBTItem) GetNonEmptyColsEqualised() string {
+	columns, data := item.GetNonEmptyCols()
+	var equalised []string
+
+	for index, col := range columns {
+		equalised = append(equalised, col+" = "+data[index])
+	}
+
+	return strings.Join(equalised, ", ")
+}
+
+// *PBTItem.SwapInvoiceDates swaps the FirstInvoice date with
+// the LastInvoice date.
+func (item *PBTItem) SwapInvoiceDates() {
+	temp := item.FirstInvoice
+	item.FirstInvoice = item.LastInvoice
+	item.LastInvoice = temp
 }
