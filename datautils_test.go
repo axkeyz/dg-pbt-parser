@@ -203,8 +203,12 @@ func TestGetInvoiceCostTypeAndConsignment(t *testing.T) {
 	}
 }
 
+// TestGetInvoiceDate tests GetInvoiceDate by checking if the
+// date is returned in the correct format.
 func TestGetInvoiceDate(t *testing.T) {
-	a1 := "Statement Invoice 3452349 for Account: 200779   -   Divers Group Trust - Warehouse                    FOR PERIOD ENDING: 10 Jul 2022"
+	a1 := `Statement Invoice 3452349 for Account: 200779   -   
+	Divers Group Trust - Warehouse                    
+	FOR PERIOD ENDING: 10 Jul 2022`
 	test := GetInvoiceDate(a1)
 
 	if test != "10-07-2022" {
