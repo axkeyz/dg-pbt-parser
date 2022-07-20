@@ -4,6 +4,7 @@ package main
 
 import (
 	"strings"
+	"time"
 )
 
 // GetCustomerRef combines the main reference (mainRef) with the
@@ -133,5 +134,8 @@ func GetInvoiceCostTypeAndConsignment(reference string,
 func GetInvoiceDate(a1 string) string {
 	cell := strings.Split(a1, " ")
 	date := cell[len(cell)-3:]
-	return strings.Join(date, " ")
+	a1 = strings.Join(date, " ")
+	t, _ := time.Parse("02 Jan 2006", a1)
+
+	return t.Format("02-01-2006")
 }

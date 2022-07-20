@@ -207,7 +207,7 @@ func TestGetInvoiceDate(t *testing.T) {
 	a1 := "Statement Invoice 3452349 for Account: 200779   -   Divers Group Trust - Warehouse                    FOR PERIOD ENDING: 10 Jul 2022"
 	test := GetInvoiceDate(a1)
 
-	if test != "11-07-2022" {
+	if test != "10-07-2022" {
 		// Test failed
 		t.Fatalf(
 			`TestGetInvoiceDate did not return 11-07-2022, got %s`,
