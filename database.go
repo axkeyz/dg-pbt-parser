@@ -100,16 +100,17 @@ func IsRowInDB(database *sql.DB, table string, tracking string) bool {
 // month or has no month. If this is true, it returns the row ID
 // as a string.
 func IsRowInDBCurrentMonth(database *sql.DB, table string,
-	item PBTItem) (exists bool, id string) {
+	item PBTItem) (exists bool, first bool, id string) {
+	var first_invoice sql.NullString
 	query := fmt.Sprintf(
-		`SELECT id from %s WHERE tracking_number = '%s' 
+		`SELECT id, first_invoice from %s WHERE tracking_number = '%s' 
 		AND (first_invoice IS NULL OR
 			strftime('%%m', first_invoice) = 
 			'%s')`, table,
 		item.TrackingNumber, item.FirstInvoice,
 	)
 
-	err := database.QueryRow(query).Scan(&id)
+	err := database.QueryRow(query).Scan(&id, &first_invoice)
 	if err != nil && err != sql.ErrNoRows {
 		FormatError(err)
 	}
@@ -118,7 +119,12 @@ func IsRowInDBCurrentMonth(database *sql.DB, table string,
 		exists = true
 	}
 
-	return exists, id
+	if first_invoice.String != "" {
+		fmt.Println(first_invoice.String)
+		first = true
+	}
+
+	return exists, first, id
 }
 
 // UpdateDBRow updates a row if the item.first_invoice is in the same
@@ -126,13 +132,16 @@ func IsRowInDBCurrentMonth(database *sql.DB, table string,
 // a new row.
 func UpdateDBForInvoices(database *sql.DB, table string, item PBTItem) {
 	isRow := IsRowInDB(database, table, item.TrackingNumber)
-	isCurrentRow, rowID := IsRowInDBCurrentMonth(database, table, item)
+	isCurrentRow, isFirst, rowID := IsRowInDBCurrentMonth(database, table, item)
 
 	var query string
 
 	if isCurrentRow {
 		// Change invoice dates
-		item.SwapInvoiceDates()
+		if isFirst {
+			item.SwapInvoiceDates()
+			// Do something
+		}
 		// Update the row with non-empty rows
 		query = fmt.Sprintf(
 			"UPDATE %s SET %s WHERE id = %s",
@@ -142,7 +151,7 @@ func UpdateDBForInvoices(database *sql.DB, table string, item PBTItem) {
 		// Execute the query
 		_, err := database.Exec(query)
 		FormatError(err)
-		fmt.Println(query)
+		// fmt.Println(query)
 	} else if isRow {
 		// Copy the data
 		query = fmt.Sprintf(
@@ -158,7 +167,7 @@ func UpdateDBForInvoices(database *sql.DB, table string, item PBTItem) {
 		// Execute the query
 		_, err := database.Exec(query)
 		FormatError(err)
-		fmt.Println(query)
+		// fmt.Println(query)
 
 		// Refresh the data
 		UpdateDBForInvoices(database, table, item)
