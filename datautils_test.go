@@ -211,10 +211,10 @@ func TestGetInvoiceDate(t *testing.T) {
 	FOR PERIOD ENDING: 10 Jul 2022`
 	test := GetInvoiceDate(a1)
 
-	if test != "10-07-2022" {
+	if test != "2022-07-10" {
 		// Test failed
 		t.Fatalf(
-			`TestGetInvoiceDate did not return 11-07-2022, got %s`,
+			`TestGetInvoiceDate did not return 2022-07-10, got %s`,
 			test,
 		)
 	}

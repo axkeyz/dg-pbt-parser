@@ -17,7 +17,7 @@ func Create200779Rows(worksheetRows [][]string) []PBTItem {
 	for _, row := range worksheetRows[1:] {
 		// Create new pbtItem from each row
 		pbtItem := PBTItem{
-			ConsignmentDate: row[4][0:10],
+			ConsignmentDate: FormatDate(row[4][0:10], "02-01-2006"),
 			ManifestNum:     row[3],
 			Consignment:     row[0],
 			CustomerRef:     GetCustomerRef(row[2], row[23]),
@@ -61,7 +61,7 @@ func CreateInvoiceRows(worksheetRows [][]string) []PBTItem {
 
 			// Set the consignment value
 			item := PBTItem{
-				TrackingNumber: strings.ToUpper(consignment),
+				TrackingNumber: consignment,
 				FirstInvoice:   GetInvoiceDate(worksheetRows[0][0]),
 			}
 

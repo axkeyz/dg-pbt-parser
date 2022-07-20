@@ -135,7 +135,10 @@ func GetInvoiceDate(a1 string) string {
 	cell := strings.Split(a1, " ")
 	date := cell[len(cell)-3:]
 	a1 = strings.Join(date, " ")
-	t, _ := time.Parse("02 Jan 2006", a1)
+	return FormatDate(a1, "02 Jan 2006")
+}
 
-	return t.Format("02-01-2006")
+func FormatDate(date string, format string) string {
+	t, _ := time.Parse(format, date)
+	return t.Format("2006-01-02")
 }
