@@ -34,11 +34,7 @@ func CreateDB(database *sql.DB, table string) {
 	);`, table)
 
 	_, err := database.Exec(query)
-
-	// Display the error
-	if err != nil {
-		fmt.Println(err)
-	}
+	FormatError(err)
 }
 
 // RefreshDBRows clears all rows in the given table name.
@@ -95,53 +91,51 @@ func IsRowInDB(database *sql.DB, table string, tracking string) bool {
 	return exists
 }
 
-// IsRowInDBCurrentMonth returns a bool of whether there is a
+// IsRowInDBCurrent returns a bool of whether there is a
 // record in the DB with the same tracking number and in the current
-// month or has no month. If this is true, it returns the row ID
-// as a string.
-func IsRowInDBCurrentMonth(database *sql.DB, table string,
-	item PBTItem) (exists bool, first bool, id string) {
-	var first_invoice sql.NullString
+// month or has no month. It also returns the latest rowID if there
+// is a record (regardless of month).
+func IsRowInDBCurrent(database *sql.DB, table string,
+	item *PBTItem) (exists bool, id string) {
+	var date sql.NullString
 	query := fmt.Sprintf(
-		`SELECT id, first_invoice from %s WHERE tracking_number = '%s' 
-		AND (first_invoice IS NULL OR
-			strftime('%%m', first_invoice) = 
-			'%s')`, table,
-		item.TrackingNumber, item.FirstInvoice,
+		`SELECT id, first_invoice from %s WHERE tracking_number = '%s'
+		ORDER BY ID DESC LIMIT 1`,
+		table, item.TrackingNumber,
 	)
 
-	err := database.QueryRow(query).Scan(&id, &first_invoice)
+	err := database.QueryRow(query).Scan(&id, &date)
 	if err != nil && err != sql.ErrNoRows {
 		FormatError(err)
 	}
 
 	if id != "" {
-		exists = true
+		d := date.String
+
+		if d == item.FirstInvoice || d == "" {
+			// In the same invoice
+			item.LastInvoice = item.FirstInvoice
+			exists = true
+		} else if d != "" && strings.Split(d, "-")[1] ==
+			strings.Split(item.FirstInvoice, "-")[1] {
+			// In the same month
+			item.SwapInvoiceDates()
+			exists = true
+		}
 	}
 
-	if first_invoice.String != "" {
-		fmt.Println(first_invoice.String)
-		first = true
-	}
-
-	return exists, first, id
+	return exists, id
 }
 
 // UpdateDBRow updates a row if the item.first_invoice is in the same
 // month as the first_invoice in the database. Otherwise, it will create
 // a new row.
 func UpdateDBForInvoices(database *sql.DB, table string, item PBTItem) {
-	isRow := IsRowInDB(database, table, item.TrackingNumber)
-	isCurrentRow, isFirst, rowID := IsRowInDBCurrentMonth(database, table, item)
+	isCurrentRow, rowID := IsRowInDBCurrent(database, table, &item)
 
 	var query string
 
 	if isCurrentRow {
-		// Change invoice dates
-		if isFirst {
-			item.SwapInvoiceDates()
-			// Do something
-		}
 		// Update the row with non-empty rows
 		query = fmt.Sprintf(
 			"UPDATE %s SET %s WHERE id = %s",
@@ -151,9 +145,7 @@ func UpdateDBForInvoices(database *sql.DB, table string, item PBTItem) {
 		// Execute the query
 		_, err := database.Exec(query)
 		FormatError(err)
-		// fmt.Println(query)
-	} else if isRow {
-		// Copy the data
+	} else if rowID != "" {
 		query = fmt.Sprintf(
 			`INSERT INTO %s (consignment_date, manifest_num,
 				consignment, customer_ref, receiver_name,
@@ -161,13 +153,13 @@ func UpdateDBForInvoices(database *sql.DB, table string, item PBTItem) {
 				sortby_code) SELECT consignment_date, manifest_num,
 				consignment, customer_ref, receiver_name,
 				area_to, tracking_number, weight, cubic,
-				sortby_code FROM %s WHERE tracking_number = '%s'`,
-			table, table, item.TrackingNumber,
+				sortby_code FROM %s WHERE id = %s`,
+			table, table, rowID,
 		)
+
 		// Execute the query
 		_, err := database.Exec(query)
 		FormatError(err)
-		// fmt.Println(query)
 
 		// Refresh the data
 		UpdateDBForInvoices(database, table, item)
