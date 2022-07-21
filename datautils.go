@@ -145,8 +145,13 @@ func GetItemDate(date string, year string) string {
 }
 
 // FormatDate standardises a date string of the given format
-// to the format 2006-01-02
+// to the format 2006-01-02.
 func FormatDate(date string, format string) string {
 	t, _ := time.Parse(format, date)
 	return t.Format("2006-01-02")
+}
+
+// GetAccount gets the PBT account from the value of cell A1.
+func GetAccount(a1 string) string {
+	return strings.Split(a1, " ")[5]
 }

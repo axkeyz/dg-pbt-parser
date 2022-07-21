@@ -30,7 +30,7 @@ func CreateDB(database *sql.DB, table string) {
 		other TEXT NULL,
 		ff_item TEXT NULL,
 		first_invoice DATE NULL,
-		last_invoice DATE NULL
+		last_invoice DATE NULL,
 		account TEXT NULL
 	);`, table)
 

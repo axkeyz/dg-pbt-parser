@@ -27,6 +27,7 @@ func Create200779Rows(worksheetRows [][]string) []PBTItem {
 			Weight:          row[11],
 			Cubic:           row[12],
 			SortbyCode:      GetSortbyCode(row[2], row[7], customers, sales),
+			Account:         "200779",
 		}
 
 		// add pbtItem to array of pbtDBRows
@@ -43,6 +44,7 @@ func CreateInvoiceRows(worksheetRows [][]string) []PBTItem {
 
 	var cost float64
 	var invoicedate = GetInvoiceDate(worksheetRows[0][0])
+	var account = GetAccount(worksheetRows[0][0])
 
 	for key, row := range worksheetRows {
 		if strings.Contains(row[0], "Statement") ||
@@ -64,6 +66,7 @@ func CreateInvoiceRows(worksheetRows [][]string) []PBTItem {
 			item := PBTItem{
 				TrackingNumber: consignment,
 				FirstInvoice:   invoicedate,
+				Account:        account,
 			}
 
 			// Add details for CL-type items (which only contains
