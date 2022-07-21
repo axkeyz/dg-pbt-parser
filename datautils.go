@@ -44,6 +44,15 @@ func GetSortbyCode(
 	return ecomSalesCode
 }
 
+// GetDefaultSortby uses the "customers" and "sales" config files
+// to get te sortby code.
+func GetDefaultSortby(reference string, receiver string) string {
+	customers := OpenConfigJSON("customers")
+	sales := OpenConfigJSON("sales")
+
+	return GetSortbyCode(reference, receiver, customers, sales)
+}
+
 // HasDGSortbyCode returns true if the given sortby code (sortbyCode) has a
 // DG-specific version in the given customers map.
 func HasDGSortbyCode(
@@ -148,6 +157,12 @@ func GetItemDate(date string, year string) string {
 // to the format 2006-01-02.
 func FormatDate(date string, format string) string {
 	t, _ := time.Parse(format, date)
+	return t.Format("2006-01-02")
+}
+
+//
+func Format23635Date(date string) string {
+	t, _ := time.Parse("02/01/2006", date)
 	return t.Format("2006-01-02")
 }
 
