@@ -138,6 +138,14 @@ func GetInvoiceDate(a1 string) string {
 	return FormatDate(a1, "02 Jan 2006")
 }
 
+// GetItemDate returns an item date in an invoice spreadsheet
+// in the format 2006-01-02.
+func GetItemDate(date string, year string) string {
+	return FormatDate(date+" "+year[:4], "02 Jan 2006")
+}
+
+// FormatDate standardises a date string of the given format
+// to the format 2006-01-02
 func FormatDate(date string, format string) string {
 	t, _ := time.Parse(format, date)
 	return t.Format("2006-01-02")
