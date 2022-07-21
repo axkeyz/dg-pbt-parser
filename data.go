@@ -70,6 +70,8 @@ func CreateInvoiceRows(worksheetRows [][]string) []PBTItem {
 			// details on the invoice)
 			if costtype == "CL" {
 				item.GetCLDetails(worksheetRows[key : key+2])
+			} else if costtype == "CT" {
+				item.GetCTDetails(row)
 			}
 
 			// Set the cost

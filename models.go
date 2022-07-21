@@ -41,6 +41,8 @@ func (item *PBTItem) SetCost(
 		item.UnderTicket = cost
 	case "CL":
 		item.Other = cost
+	case "CT":
+		item.Other = cost
 	default:
 		item.ItemCost = cost
 	}
@@ -122,4 +124,14 @@ func (item *PBTItem) GetCLDetails(row [][]string) {
 	item.Weight = strings.ToUpper(row[0][7])
 	item.Cubic = strings.ToUpper(row[0][8])
 	item.FFItem = strings.ToUpper(row[0][6])
+}
+
+func (item *PBTItem) GetCTDetails(row []string) {
+	// item.ConsignmentDate = GetItemDate(row[0], item.FirstInvoice)
+	item.SortbyCode = "DIVERS"
+	item.CustomerRef = "ADMIN CHARGE"
+	item.ManifestNum = "ADMIN CHARGE"
+	item.ReceiverName = "ADMIN CHARGE"
+	item.SortbyCode = "DIVERS"
+	item.ConsignmentDate = GetItemDate(row[0], item.FirstInvoice)
 }
