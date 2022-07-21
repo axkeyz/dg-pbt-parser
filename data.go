@@ -87,3 +87,41 @@ func CreateInvoiceRows(worksheetRows [][]string) []PBTItem {
 
 	return pbtRows
 }
+
+// Create23635Items returns a []PBTItem from a [][]string
+// of PBT 23635 worksheet array.
+func Create23635Items(worksheet [][]string) []PBTItem {
+	var items []PBTItem
+	a1 := strings.Split(worksheet[0][0], " ")
+	var invdate = Format23635Date(
+		a1[len(a1)-1],
+	)
+
+	for _, row := range worksheet {
+		if strings.Contains(row[0], "Invoice") ||
+			strings.Contains(row[0], "GST") ||
+			strings.Contains(row[0], "DATE") ||
+			row[0] == "" {
+			continue
+		}
+
+		items = append(items, PBTItem{
+			ConsignmentDate: Format23635Date(row[0]),
+			Consignment:     strings.ToUpper(row[1]),
+			TrackingNumber:  strings.ToUpper(row[1]),
+			CustomerRef:     strings.ToUpper(row[3]),
+			ReceiverName:    strings.ToUpper(strings.Split(row[2], "  ")[0]),
+			FirstInvoice:    invdate,
+			LastInvoice:     invdate,
+			Account:         "23635",
+			FFItem:          row[4],
+			Weight:          row[5],
+			Cubic:           row[6],
+			SortbyCode:      GetDefaultSortby(row[3], row[2]),
+			Other:           row[7],
+			AreaTo:          strings.ToUpper(row[10]),
+		})
+	}
+
+	return items
+}

@@ -70,19 +70,38 @@ func CreateAll200779DBRows(database *sql.DB, table string) {
 	}
 }
 
-// Get all invoices and extract needed data
-func CreateAllInvoiceCosts(database *sql.DB, table string) {
-	// func CreateAllInvoiceCosts() {
+// CreateAllInvoiceCosts creates all invoice costs by
+// matching corresponding lines in the spreadsheet to
+// the database.
+func CreateAllInvoiceCosts(db *sql.DB, table string) {
+	// Get the runsheets
 	invoices := GetMatchingRunsheets("uploads/WebCSVStmt_*")
-	// var costtype, consignment string
 
 	for _, invoice := range invoices {
-		// fmt.Println(invoice)
-		// fmt.Println(ExtractSheet(invoice, "csv")[10][10])
+		// Convert rows to PBTItem structs
 		items := CreateInvoiceRows(ExtractSheet(invoice, "csv"))
-		// fmt.Println(items)
+
 		for _, item := range items {
-			UpdateDBForInvoices(database, table, item)
+			// Update database with items
+			UpdateDBForInvoices(db, table, item)
+		}
+	}
+}
+
+// Create23635Rows creates rows according to the matching
+// spreadsheet under the PBT 23635 account.
+func CreateAll23635Rows(db *sql.DB, table string) {
+	// Get the invoices
+	invoices := GetMatchingRunsheets("uploads/PBT_Invoice_*")
+
+	for _, invoice := range invoices {
+		// Convert rows to PBTItem structs
+		items := Create23635Items(ExtractSheet(invoice, "csv"))
+		// fmt.Println(ExtractSheet(invoice, "csv"))
+
+		for _, item := range items {
+			// Update database with items
+			UpdateDBForInvoices(db, table, item)
 		}
 	}
 }
