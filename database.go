@@ -98,10 +98,11 @@ func IsRowInDB(database *sql.DB, table string, tracking string) bool {
 func IsRowInDBCurrent(database *sql.DB, table string,
 	item *PBTItem) (exists bool, id string) {
 	var date sql.NullString
+	month := strings.Split(item.FirstInvoice, "-")[1]
 	query := fmt.Sprintf(
 		`SELECT id, first_invoice from %s WHERE tracking_number = '%s'
-		ORDER BY ID DESC LIMIT 1`,
-		table, item.TrackingNumber,
+		AND (first_invoice LIKE "%%-%s-%%" OR first_invoice IS NULL)`,
+		table, item.TrackingNumber, month,
 	)
 
 	err := database.QueryRow(query).Scan(&id, &date)
@@ -117,7 +118,7 @@ func IsRowInDBCurrent(database *sql.DB, table string,
 			item.LastInvoice = item.FirstInvoice
 			exists = true
 		} else if d != "" && strings.Split(d, "-")[1] ==
-			strings.Split(item.FirstInvoice, "-")[1] {
+			month {
 			// In the same month
 			item.SwapInvoiceDates()
 			exists = true
@@ -132,6 +133,7 @@ func IsRowInDBCurrent(database *sql.DB, table string,
 // a new row.
 func UpdateDBForInvoices(database *sql.DB, table string, item PBTItem) {
 	isCurrentRow, rowID := IsRowInDBCurrent(database, table, &item)
+	isRow := IsRowInDB(database, table, item.TrackingNumber)
 
 	var query string
 
@@ -145,7 +147,7 @@ func UpdateDBForInvoices(database *sql.DB, table string, item PBTItem) {
 		// Execute the query
 		_, err := database.Exec(query)
 		FormatError(err)
-	} else if rowID != "" {
+	} else if isRow {
 		query = fmt.Sprintf(
 			`INSERT INTO %s (consignment_date, manifest_num,
 				consignment, customer_ref, receiver_name,
@@ -153,8 +155,8 @@ func UpdateDBForInvoices(database *sql.DB, table string, item PBTItem) {
 				sortby_code) SELECT consignment_date, manifest_num,
 				consignment, customer_ref, receiver_name,
 				area_to, tracking_number, weight, cubic,
-				sortby_code FROM %s WHERE id = %s`,
-			table, table, rowID,
+				sortby_code FROM %s WHERE tracking_number = "%s"`,
+			table, table, item.TrackingNumber,
 		)
 
 		// Execute the query
