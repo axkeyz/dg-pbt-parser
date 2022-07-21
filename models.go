@@ -24,6 +24,7 @@ type PBTItem struct {
 	FFItem          string
 	FirstInvoice    string
 	LastInvoice     string
+	Account         string
 }
 
 // *PBTItem.SetCost sets PBT a cost depending on the
@@ -72,6 +73,7 @@ func (item *PBTItem) GetNonEmptyCols() (
 		"ff_item":          item.FFItem,
 		"first_invoice":    item.FirstInvoice,
 		"last_invoice":     item.LastInvoice,
+		"account":          item.Account,
 	}
 
 	for col, val := range fields {
