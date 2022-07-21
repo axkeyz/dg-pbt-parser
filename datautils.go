@@ -51,7 +51,8 @@ func HasDGSortbyCode(
 ) (bool, string) {
 	for correctedCode, customer := range customers {
 		for _, c := range customer {
-			if c == sortbyCode {
+			if strings.Contains(c, sortbyCode) ||
+				strings.Contains(sortbyCode, c) {
 				return true, correctedCode
 			}
 		}
