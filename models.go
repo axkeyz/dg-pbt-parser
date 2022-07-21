@@ -127,9 +127,9 @@ func (item *PBTItem) GetCLDetails(row [][]string) {
 }
 
 func (item *PBTItem) GetCTDetails(row []string) {
-	// item.ConsignmentDate = GetItemDate(row[0], item.FirstInvoice)
 	item.CustomerRef = "ADMIN CHARGE"
 	item.ManifestNum = "ADMIN CHARGE"
 	item.ReceiverName = "ADMIN CHARGE"
 	item.ConsignmentDate = GetItemDate(row[0], item.FirstInvoice)
+	item.LastInvoice = item.FirstInvoice
 }
