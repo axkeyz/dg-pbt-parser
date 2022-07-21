@@ -55,7 +55,7 @@ func ExtractSheet(runsheet string, format string) [][]string {
 
 // CreateAll200779Rows creates new rows in the 200779 database
 // where the data is extracted from the available PBTOne spreadsheets.
-func CreateAll200779DBRows(database *sql.DB) {
+func CreateAll200779DBRows(database *sql.DB, table string) {
 	// Get the PBT runsheets
 	runsheets := GetMatchingRunsheets("uploads/*runsheet_exporting*.xls*")
 
@@ -65,7 +65,7 @@ func CreateAll200779DBRows(database *sql.DB) {
 
 		// Create a new row in the database for each PBT item row
 		for _, row := range pbtRows {
-			NewDBRow(database, "pbt_200779", row, true)
+			NewDBRow(database, table, row, true)
 		}
 	}
 }
