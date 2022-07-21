@@ -41,9 +41,10 @@ func Create200779Rows(worksheetRows [][]string) []PBTItem {
 func CreateInvoiceRows(worksheetRows [][]string) []PBTItem {
 	var pbtRows []PBTItem
 
-	var item_cost float64
+	var cost float64
+	var invoicedate = GetInvoiceDate(worksheetRows[0][0])
 
-	for _, row := range worksheetRows {
+	for key, row := range worksheetRows {
 		if strings.Contains(row[0], "Statement") ||
 			strings.Contains(row[0], "GST") {
 			continue
@@ -53,16 +54,22 @@ func CreateInvoiceRows(worksheetRows [][]string) []PBTItem {
 			break
 		}
 
-		item_cost, _ = strconv.ParseFloat(row[9], 32)
+		cost, _ = strconv.ParseFloat(row[9], 32)
 
-		if int(item_cost*100) > 0 {
+		if int(cost*100) > 0 {
 			// Create new pbtItem from each row
 			costtype, consignment := GetInvoiceCostTypeAndConsignment(row[1], row[3])
 
 			// Set the consignment value
 			item := PBTItem{
 				TrackingNumber: consignment,
-				FirstInvoice:   GetInvoiceDate(worksheetRows[0][0]),
+				FirstInvoice:   invoicedate,
+			}
+
+			// Add details for CL-type items (which only contains
+			// details on the invoice)
+			if costtype == "CL" {
+				item.GetCLDetails(worksheetRows[key : key+2])
 			}
 
 			// Set the cost

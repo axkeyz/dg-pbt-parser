@@ -21,7 +21,7 @@ type PBTItem struct {
 	UnderTicket     string
 	Adjustment      string
 	Other           string
-	FFItems         string
+	FFItem          string
 	FirstInvoice    string
 	LastInvoice     string
 }
@@ -67,7 +67,7 @@ func (item *PBTItem) GetNonEmptyCols() (
 		"under_ticket":     item.UnderTicket,
 		"adjustment":       item.Adjustment,
 		"other":            item.Other,
-		"ff_items":         item.FFItems,
+		"ff_item":          item.FFItem,
 		"first_invoice":    item.FirstInvoice,
 		"last_invoice":     item.LastInvoice,
 	}
@@ -101,4 +101,25 @@ func (item *PBTItem) SwapInvoiceDates() {
 	temp := item.FirstInvoice
 	item.FirstInvoice = item.LastInvoice
 	item.LastInvoice = temp
+}
+
+// *PBTItem.GetCLDetails gets the details of a CL-type item
+// when given two consecutive rows as a [][]string.
+func (item *PBTItem) GetCLDetails(row [][]string) {
+	customers := OpenConfigJSON("customers")
+	sales := OpenConfigJSON("sales")
+
+	item.ConsignmentDate = GetItemDate(row[0][0], item.FirstInvoice)
+	item.Consignment = item.TrackingNumber
+	item.ReceiverName = strings.ToUpper(row[0][3][3:])
+	item.AreaTo = strings.ToUpper(row[1][3])
+	item.CustomerRef = strings.ToUpper(row[0][2])
+	item.SortbyCode = GetSortbyCode(
+		item.CustomerRef, item.ReceiverName,
+		customers, sales,
+	)
+	item.ManifestNum = strings.ToUpper(row[1][1])
+	item.Weight = strings.ToUpper(row[0][7])
+	item.Cubic = strings.ToUpper(row[0][8])
+	item.FFItem = strings.ToUpper(row[0][6])
 }
