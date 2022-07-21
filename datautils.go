@@ -3,7 +3,6 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 	"time"
 )
@@ -29,7 +28,6 @@ func GetSortbyCode(
 	sortbyCode := strings.ToUpper(StripNonLetters(customerRef))
 
 	if ok, sortbyCode := HasDGSortbyCode(sortbyCode, customers); ok {
-		fmt.Println(customerRef, receiverName, sortbyCode)
 		// Retrun standardised DG sortby code
 		return sortbyCode
 	}
@@ -76,15 +74,9 @@ func TryDGSalesEComSortbyCode(
 	receiverName string, salesCustomers map[string][]string,
 ) string {
 	receiverName = strings.ToUpper(receiverName)
-	// Iterate through sales customers to check if the receiver name
-	// matches any of the sales customer aliases.
-	for sortbyCode, names := range salesCustomers {
-		for _, name := range names {
-			if strings.Contains(name, receiverName) ||
-				strings.Contains(receiverName, name) {
-				return sortbyCode
-			}
-		}
+
+	if ok, code := HasDGSortbyCode(receiverName, salesCustomers); ok {
+		return code
 	}
 
 	// Allow name look-alikes to pass as E Commerce
