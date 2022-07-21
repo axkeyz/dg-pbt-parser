@@ -3,6 +3,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 	"time"
 )
@@ -28,6 +29,7 @@ func GetSortbyCode(
 	sortbyCode := strings.ToUpper(StripNonLetters(customerRef))
 
 	if ok, sortbyCode := HasDGSortbyCode(sortbyCode, customers); ok {
+		fmt.Println(customerRef, receiverName, sortbyCode)
 		// Retrun standardised DG sortby code
 		return sortbyCode
 	}
@@ -49,6 +51,9 @@ func GetSortbyCode(
 func HasDGSortbyCode(
 	sortbyCode string, customers map[string][]string,
 ) (bool, string) {
+	if sortbyCode == "" {
+		return false, ""
+	}
 	for correctedCode, customer := range customers {
 		for _, c := range customer {
 			if strings.Contains(c, sortbyCode) ||
