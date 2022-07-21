@@ -11,9 +11,14 @@ Some of the data is a bit confidential, so all the non *_test.json files in the 
 ## TODO
 
 - Make it easier to edit the data in the database? (such as correct unknown sortby codes)
-- Iterate through all "runsheet_exporting.xlsx" files in a folder
-- Use invoice spreadsheet files to fill in price columns
-- Iterate through all invoice spreadsheet files in a folder
 - Export final data in .xlsx format with all the correct formula
-- Create the other two PBT accounts (repeating steps 2-5?)
+- Create the other two PBT accounts
 - GUI?
+
+## Quickstart
+
+I don't think this will be very useful outside of Divers, but here's the quickstart for now anyway.
+
+1. `git clone https://github.com/axkeyz/dg-pbt-parser`
+2. `go run .`
+3. Profit??
