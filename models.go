@@ -126,6 +126,7 @@ func (item *PBTItem) GetCLDetails(row [][]string) {
 	item.Weight = strings.ToUpper(row[0][7])
 	item.Cubic = strings.ToUpper(row[0][8])
 	item.FFItem = strings.ToUpper(row[0][6])
+	item.LastInvoice = item.FirstInvoice
 }
 
 func (item *PBTItem) GetCTDetails(row []string) {
