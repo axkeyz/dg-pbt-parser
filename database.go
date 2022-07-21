@@ -166,8 +166,16 @@ func UpdateDBForInvoices(database *sql.DB, table string, item PBTItem) {
 		// Refresh the data
 		UpdateDBForInvoices(database, table, item)
 	} else {
+		// Try to get sortby code
+		customers := OpenConfigJSON("customers")
+		sales := OpenConfigJSON("sales")
+
+		item.SortbyCode = GetSortbyCode(
+			item.CustomerRef, item.ReceiverName,
+			customers, sales,
+		)
+
 		// Create a new row with non-empty rows
-		item.SortbyCode = "UNKNOWN"
 		NewDBRow(database, table, item, false)
 	}
 }
