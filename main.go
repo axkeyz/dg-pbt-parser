@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -10,9 +9,10 @@ import (
 func main() {
 	database, _ := sql.Open("sqlite3", "./dgpbt.db")
 
-	CreateDB(database, "pbt_200779")
+	table := "pbt_main"
 
-	Create200779Rows(ExtractPBTONERunsheet())
+	CreateDB(database, table)
 
-	fmt.Println("Done")
+	CreateAll200779DBRows(database, table)
+	CreateAllInvoiceCosts(database, table)
 }
