@@ -123,7 +123,7 @@ func GetInvoiceCostTypeAndConsignment(reference string,
 	} else if strings.Contains(reference, "CT") {
 		return "CT", reference
 	} else if strings.Contains(reference, "UT") ||
-		reference == "" {
+		reference == "" || strings.Contains(reference, "UND") {
 		return "UT", strings.Split(description, " ")[1]
 	} else {
 		return "NOR", reference
