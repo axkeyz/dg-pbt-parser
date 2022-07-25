@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"strconv"
 )
 
 // StripNonLetters is a utility function that strips all non-letters
@@ -56,4 +57,26 @@ func FormatError(err error) {
 	if err != nil {
 		fmt.Println(err)
 	}
+}
+
+// StringToFloat converts a string to a float64.
+func StringToFloat(intstring string) float64 {
+	if intstring == "" {
+		return 0
+	}
+	intfloat, err := strconv.ParseFloat(intstring, 64)
+	FormatError(err)
+	return intfloat
+}
+
+// StringToFloat converts a string to an int.
+func StringToInt(intstring string) int {
+	if intstring == "" {
+		return 0
+	}
+
+	intfloat, err := strconv.Atoi(intstring)
+	FormatError(err)
+
+	return intfloat
 }
