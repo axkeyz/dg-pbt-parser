@@ -160,10 +160,18 @@ func FormatDate(date string, format string) string {
 	return t.Format("2006-01-02")
 }
 
-//
+// Format23635Date formats a 23635 invoice date, from a date
+// in the format 02/01/2006 to 2006-01-02.
 func Format23635Date(date string) string {
 	t, _ := time.Parse("02/01/2006", date)
 	return t.Format("2006-01-02")
+}
+
+// FormatDBDate converts a DB date to a export PBT sheet, from
+// a date in the format 2006-01-02 to Jan 02.
+func FormatDBDate(date string) string {
+	t, _ := time.Parse("2006-01-02", date)
+	return t.Format("Jan 02")
 }
 
 // GetAccount gets the PBT account from the value of cell A1.
