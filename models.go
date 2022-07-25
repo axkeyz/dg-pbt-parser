@@ -1,13 +1,15 @@
 package main
 
-import "strings"
+import (
+	"strings"
+)
 
 // PBTItem represents a row of PBT data (one row per freight
 // item).
 type PBTItem struct {
 	ID              string
 	ConsignmentDate string
-	ManifestNum     string
+	ManifestNumber  string
 	Consignment     string
 	CustomerRef     string
 	ReceiverName    string
@@ -56,7 +58,7 @@ func (item *PBTItem) GetNonEmptyCols() (
 ) {
 	fields := map[string]string{
 		"consignment_date": item.ConsignmentDate,
-		"manifest_num":     item.ManifestNum,
+		"manifest_number":  item.ManifestNumber,
 		"consignment":      item.Consignment,
 		"customer_ref":     item.CustomerRef,
 		"receiver_name":    item.ReceiverName,
@@ -122,16 +124,18 @@ func (item *PBTItem) GetCLDetails(row [][]string) {
 		item.CustomerRef, item.ReceiverName,
 		customers, sales,
 	)
-	item.ManifestNum = strings.ToUpper(row[1][1])
+	item.ManifestNumber = strings.ToUpper(row[1][1])
 	item.Weight = strings.ToUpper(row[0][7])
 	item.Cubic = strings.ToUpper(row[0][8])
 	item.FFItem = strings.ToUpper(row[0][6])
 	item.LastInvoice = item.FirstInvoice
 }
 
+// *PBTItem.GetCTDetails creates the details of a CT-type
+// item (admin charges)
 func (item *PBTItem) GetCTDetails(row []string) {
 	item.CustomerRef = "ADMIN CHARGE"
-	item.ManifestNum = "ADMIN CHARGE"
+	item.ManifestNumber = "ADMIN CHARGE"
 	item.ReceiverName = "ADMIN CHARGE"
 	item.ConsignmentDate = GetItemDate(row[0], item.FirstInvoice)
 	item.LastInvoice = item.FirstInvoice

@@ -14,7 +14,7 @@ func CreateDB(database *sql.DB, table string) {
 	query := fmt.Sprintf(`CREATE TABLE IF NOT EXISTS %s (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		consignment_date DATE,
-		manifest_num TEXT NULL,
+		manifest_number TEXT NULL,
 		consignment TEXT NULL,
 		customer_ref TEXT NULL,
 		receiver_name TEXT NULL,
@@ -150,10 +150,10 @@ func UpdateDBForInvoices(database *sql.DB, table string, item PBTItem) {
 		FormatError(err)
 	} else if isRow {
 		query = fmt.Sprintf(
-			`INSERT INTO %s (consignment_date, manifest_num,
+			`INSERT INTO %s (consignment_date, manifest_number,
 				consignment, customer_ref, receiver_name,
 				area_to, tracking_number, weight, cubic,
-				sortby_code) SELECT consignment_date, manifest_num,
+				sortby_code) SELECT consignment_date, manifest_number,
 				consignment, customer_ref, receiver_name,
 				area_to, tracking_number, weight, cubic,
 				sortby_code FROM %s WHERE tracking_number = "%s"`,
