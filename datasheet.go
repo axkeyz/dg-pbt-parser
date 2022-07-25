@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/xuri/excelize/v2"
 )
@@ -104,4 +105,67 @@ func CreateAll23635Rows(db *sql.DB, table string) {
 			UpdateDBForInvoices(db, table, item)
 		}
 	}
+}
+
+// ExportDB exports the database for the given month
+func ExportDB(db *sql.DB, table string, month string) {
+	// Create new workbook and sheet
+	f := excelize.NewFile()
+	f.SetSheetName("Sheet1", "PBT")
+
+	// Get data
+	items := GetDBRowsByMonth(db, table, month)
+	currentTime := time.Now()
+
+	SetHeader(f, "PBT")
+
+	for row, item := range items {
+		item.ToExcel(f, "PBT", row+4)
+	}
+
+	if err := f.SaveAs("exports/PBT" +
+		currentTime.Format("2006-02-01") +
+		".xlsx",
+	); err != nil {
+		FormatError(err)
+	}
+}
+
+// SetHeader sets a header of an export spreadsheet.
+func SetHeader(f *excelize.File, sheet string) {
+	f.SetCellValue(sheet, "V1", "FAF")
+	SetCellFloat(f, sheet, "W1", "0.1189")
+
+	columns := []string{
+		"consignment_date", "manifest_number", "consignment",
+		"customer_consignment", "receivers_name", "area_to",
+		"tracking_number", "product_type", "weight", "cubic",
+		"dg_charge", "sat_del_charge", "item_cost", "sortby_code",
+		"Total Item Cost", "Rural Delivery",
+		"Accrue Rural Delivery", "U/Ticket", "Adjs/sheet",
+		"Other", "Sub-total", "FAF", "Cost", "# of FF items",
+		"# of tickets per parcel", "RATING",
+		"Cubic converted to weight", "Highest weight",
+		"Expected Charge", "Variance", "Invoice #", "Note",
+	}
+
+	for i, col := range columns {
+		cell, err := excelize.CoordinatesToCellName(i+1, 3)
+		FormatError(err)
+		f.SetCellValue(sheet, cell, col)
+	}
+}
+
+// SetCellFloat converts a string to a float and then adds the value
+// into the given cell, of the sheet in the file.
+func SetCellFloat(
+	file *excelize.File, sheet string, cell string, value string,
+) {
+	if value == "" {
+		// Do not add anything to cell
+		return
+	}
+
+	// Add value to cell
+	file.SetCellFloat(sheet, cell, StringToFloat(value), 2, 64)
 }

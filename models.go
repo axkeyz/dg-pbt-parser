@@ -1,7 +1,10 @@
 package main
 
 import (
+	"strconv"
 	"strings"
+
+	"github.com/xuri/excelize/v2"
 )
 
 // PBTItem represents a row of PBT data (one row per freight
@@ -139,4 +142,53 @@ func (item *PBTItem) GetCTDetails(row []string) {
 	item.ReceiverName = "ADMIN CHARGE"
 	item.ConsignmentDate = GetItemDate(row[0], item.FirstInvoice)
 	item.LastInvoice = item.FirstInvoice
+}
+
+// *PBTItem.ToExcel writes the details of the PBTItem in the excel
+// file and sheet in the given row.
+func (item *PBTItem) ToExcel(
+	file *excelize.File, sheet string, row int,
+) {
+	r := strconv.Itoa(row)
+
+	// Set default columns
+	file.SetCellValue(sheet, "A"+r, item.ConsignmentDate)
+	file.SetCellValue(sheet, "B"+r, item.ManifestNumber)
+	file.SetCellValue(sheet, "C"+r, item.Consignment)
+	file.SetCellValue(sheet, "D"+r, item.CustomerRef)
+	file.SetCellValue(sheet, "E"+r, item.ReceiverName)
+	file.SetCellValue(sheet, "F"+r, item.AreaTo)
+	file.SetCellValue(sheet, "G"+r, item.TrackingNumber)
+	SetCellFloat(file, sheet, "I"+r, item.Weight)
+	SetCellFloat(file, sheet, "J"+r, item.Cubic)
+	file.SetCellValue(sheet, "N"+r, item.SortbyCode)
+	SetCellFloat(file, sheet, "M"+r, item.ItemCost)
+	SetCellFloat(file, sheet, "P"+r, item.RuralDelivery)
+	SetCellFloat(file, sheet, "R"+r, item.UnderTicket)
+	SetCellFloat(file, sheet, "S"+r, item.Adjustment)
+	file.SetCellFormula(sheet, "O"+r, "=IF(M"+r+">0, M"+r+", \"\")")
+	SetCellFloat(file, sheet, "T"+r, item.Other)
+	SetCellFloat(file, sheet, "X"+r, item.FFItem)
+	file.SetCellFormula(sheet, "U"+r, "=SUM(O"+r+":T"+r+")")
+	file.SetCellFormula(sheet, "V"+r, "=U"+r+"*$W$1")
+	file.SetCellFormula(sheet, "W"+r, "=V"+r+"+U"+r)
+	file.SetCellValue(sheet, "AE"+r,
+		item.Account+" "+FormatDBDate(item.FirstInvoice),
+	)
+
+	// Set conditional columns based on invoice cost type
+	invoicetype, _ := GetInvoiceCostTypeAndConsignment(
+		item.TrackingNumber, item.CustomerRef)
+
+	if invoicetype == "NOR" {
+		file.SetCellFormula(sheet, "Z"+r,
+			"=VLOOKUP(F"+r+",'new rates 29feb16'!K:L,2,FALSE)")
+		file.SetCellFormula(sheet, "AA"+r, "=200*J"+r)
+		file.SetCellFormula(sheet, "AB"+r, "=ROUND(MAX(I"+r+",AA"+r+"),0)")
+		file.SetCellFormula(sheet, "AC"+r,
+			"=INDEX(NewRates,MATCH(AB"+r+
+				",Weight,-1),MATCH(Z"+r+",Service,0))")
+		file.SetCellFormula(sheet, "AD"+r,
+			"=O"+r+"-AC"+r)
+	}
 }

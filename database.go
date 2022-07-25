@@ -180,3 +180,52 @@ func UpdateDBForInvoices(database *sql.DB, table string, item PBTItem) {
 		NewDBRow(database, table, item, false)
 	}
 }
+
+// GetDBRowsByMonth returns all rows and columns in the database (db)
+// of the given table, where the first_invoice date is in the given month.
+// The data is returned as a []PBTItem.
+func GetDBRowsByMonth(db *sql.DB, table string, month string) []PBTItem {
+	var items []PBTItem
+	var item PBTItem
+
+	// Create query
+	query := fmt.Sprintf(
+		`SELECT id, ifnull(consignment_date, ''),
+		ifnull(manifest_number, ''), ifnull(consignment, ''),
+		ifnull(customer_ref, ''), ifnull(receiver_name, ''),
+		ifnull(area_to, ''), ifnull(tracking_number, ''),
+		ifnull(weight, ''), ifnull(cubic, ''),
+		ifnull(item_cost, ''), ifnull(sortby_code, ''),
+		ifnull(rural_delivery, ''), ifnull(under_ticket, ''),
+		ifnull(adjustment, ''), ifnull(other, ''),
+		ifnull(ff_item, ''), ifnull(first_invoice, ''),
+		ifnull(last_invoice, ''), ifnull(account, '')
+		from %s where first_invoice LIKE "%%-%s-%%"`,
+		table, month,
+	)
+
+	rows, err := db.Query(query)
+	FormatError(err)
+	defer rows.Close()
+
+	for rows.Next() {
+		// Place data into PBTItem struct and display any errors
+		err = rows.Scan(&item.ID, &item.ConsignmentDate,
+			&item.ManifestNumber, &item.Consignment,
+			&item.CustomerRef, &item.ReceiverName,
+			&item.AreaTo, &item.TrackingNumber,
+			&item.Weight, &item.Cubic,
+			&item.ItemCost, &item.SortbyCode,
+			&item.RuralDelivery, &item.UnderTicket,
+			&item.Adjustment, &item.Other, &item.FFItem,
+			&item.FirstInvoice, &item.LastInvoice,
+			&item.Account,
+		)
+		FormatError(err)
+
+		// Place into []PBTItem
+		items = append(items, item)
+	}
+
+	return items
+}

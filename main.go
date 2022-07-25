@@ -16,4 +16,8 @@ func main() {
 	CreateAll200779DBRows(database, table)
 	CreateAllInvoiceCosts(database, table)
 	CreateAll23635Rows(database, table)
+
+	// fmt.Println(GetDBRowsByMonth(database, table, "07"))
+
+	ExportDB(database, table, "07")
 }
