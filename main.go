@@ -1,6 +1,9 @@
 package main
 
 import (
+	"time"
+	"fmt"
+
 	"database/sql"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -19,5 +22,7 @@ func main() {
 
 	// fmt.Println(GetDBRowsByMonth(database, table, "07"))
 
-	ExportDB(database, table, "07")
+	month := fmt.Sprintf("%02d", int(time.Now().Month()) - 1)
+
+	ExportDB(database, table, month)
 }
