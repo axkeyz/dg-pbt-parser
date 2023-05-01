@@ -160,6 +160,13 @@ func FormatDate(date string, format string) string {
 	return t.Format("2006-01-02")
 }
 
+// FormatExcelDate standardises a date string of the given format
+// to the format 02/01/2006
+func FormatExcelDate(date string, format string) string {
+	t, _ := time.Parse(format, date)
+	return t.Format("02/01/2006")
+}
+
 // Format23635Date formats a 23635 invoice date, from a date
 // in the format 02/01/2006 to 2006-01-02.
 func Format23635Date(date string) string {

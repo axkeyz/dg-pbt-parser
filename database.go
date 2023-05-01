@@ -223,6 +223,8 @@ func GetDBRowsByMonth(db *sql.DB, table string, month string) []PBTItem {
 		)
 		FormatError(err)
 
+		item.ConsignmentDate = FormatExcelDate(item.ConsignmentDate, "2006-01-02")
+
 		// Place into []PBTItem
 		items = append(items, item)
 	}
