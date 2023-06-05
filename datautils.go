@@ -106,8 +106,8 @@ func GetRegion(depotName string) string {
 	}
 
 	// Remove first two words (PBT Couriers) and last word (Depot)
-	name := strings.TrimSpace(strings.Split(depotName, " ")[2:])
-	return strings.ToUpper(strings.Join(name[:len(name)-1], " "))
+	name := strings.Split(depotName, " ")[2:]
+	return strings.TrimSpace(strings.ToUpper(strings.Join(name[:len(name)-1], " ")))
 }
 
 // GetInvoiceCostTypeAndConsignment attempts to get the cost type
