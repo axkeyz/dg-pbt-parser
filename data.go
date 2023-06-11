@@ -47,12 +47,9 @@ func CreateInvoiceRows(worksheetRows [][]string) []PBTItem {
 	var account = GetAccount(worksheetRows[0][0])
 
 	for key, row := range worksheetRows {
-		if strings.Contains(row[0], "Statement") ||
-			strings.Contains(row[0], "GST") {
+		if IsDataStart(row) {
 			continue
-		} else if strings.Contains(row[3], "VFC") ||
-			strings.Contains(row[3], "NETT AMT") ||
-			strings.Contains(row[9], "----") {
+		} else if IsDataEnd(row) {
 			break
 		}
 
@@ -93,20 +90,15 @@ func CreateInvoiceRows(worksheetRows [][]string) []PBTItem {
 func Create23635Items(worksheet [][]string) []PBTItem {
 	var items []PBTItem
 	a1 := strings.Split(worksheet[0][0], " ")
-	var invdate = Format23635Date(
-		a1[len(a1)-1],
-	)
+	var invdate = FormatDate(a1[len(a1)-1], "02/01/2006")
 
 	for _, row := range worksheet {
-		if strings.Contains(row[0], "Invoice") ||
-			strings.Contains(row[0], "GST") ||
-			strings.Contains(row[0], "DATE") ||
-			row[0] == "" {
+		if Is23635DataDiscard(row) {
 			continue
 		}
 
 		items = append(items, PBTItem{
-			ConsignmentDate: Format23635Date(row[0]),
+			ConsignmentDate: FormatDate(row[0], "02/01/2006"),
 			Consignment:     strings.ToUpper(row[1]),
 			TrackingNumber:  strings.ToUpper(row[1]),
 			CustomerRef:     strings.ToUpper(row[3]),
@@ -124,4 +116,34 @@ func Create23635Items(worksheet [][]string) []PBTItem {
 	}
 
 	return items
+}
+
+// Checks if the data is a discarded comment before
+// the start of the needed data.
+func IsDataStart(row []string) bool {
+	if strings.Contains(row[0], "Statement") ||
+		strings.Contains(row[0], "GST") {
+		return true
+	}
+	return false
+}
+
+// Checks if the data is a discarded comment after
+// the end of the needed data.
+func IsDataEnd(row []string) bool {
+	if strings.Contains(row[3], "VFC") ||
+		strings.Contains(row[3], "NETT AMT") ||
+		strings.Contains(row[9], "----") {
+		return true
+	}
+
+	return false
+}
+
+// Checks if the data is a discarded comment of 23635 invoices.
+func Is23635DataDiscard(row []string) bool {
+	return strings.Contains(row[0], "Invoice") ||
+		strings.Contains(row[0], "GST") ||
+		strings.Contains(row[0], "DATE") ||
+		row[0] == ""
 }
