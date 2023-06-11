@@ -30,9 +30,7 @@ func OpenConfigJSON(fileName string) map[string][]string {
 
 	// Get entire contents of file
 	content, err := ioutil.ReadFile("config/" + fileName + ".json")
-	if err != nil {
-		fmt.Println(err)
-	}
+	FormatError(err)
 
 	// Unmarshal or Decode the JSON to the interface.
 	json.Unmarshal(content, &configJSON)
