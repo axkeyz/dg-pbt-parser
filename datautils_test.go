@@ -83,7 +83,7 @@ func TestHasDGSortbyCode(t *testing.T) {
 		"MX":    true,
 		"MXUDF": true,
 		"OPURO": true,
-		"OP":    false,
+		"OP":    true,
 		"NXU":   false,
 	}
 
@@ -94,8 +94,8 @@ func TestHasDGSortbyCode(t *testing.T) {
 		if actual != expected {
 			// Test failed
 			t.Fatalf(
-				`TestStripNonLetters("%s") did not return %v, got %v`,
-				test, expected, actual,
+				`TestHasDGSortbyCode("%s", %v) did not return %v, got %v`,
+				test, customers, expected, actual,
 			)
 		}
 	}
